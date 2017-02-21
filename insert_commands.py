@@ -29,7 +29,6 @@ Products = ('CREATE TABLE Products('
    'units_per_case INTEGER,'
    'cost_per_case NUMERIC,'
    'case_weight NUMERIC,'
-   #'total_cases_per_pallete INTEGER,'
    'shelf_life INTEGER,'
    'FOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id));')
 
@@ -37,6 +36,7 @@ Shipments = ('CREATE TABLE Shipments('
    'shipment_id SERIAL PRIMARY KEY,'
    'date_received DATE,'
    'supplier_id INTEGER,'
+   'is_considered INTEGER NOT NULL DEFAULT(0),'# ***
    'FOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id));')
 
 
@@ -66,10 +66,11 @@ Clients = ('CREATE TABLE Clients('
    'email VARCHAR(255));')
 
 Orders = ('CREATE TABLE Orders('
-  'order_id SERIAL PRIMARY KEY,'
+   'order_id SERIAL PRIMARY KEY,'
    'client_id INTEGER,'
    'delivery_date DATE,'
    'is_delivered INTEGER NOT NULL DEFAULT(0),'
+   'is_considered INTEGER NOT NULL DEFAULT(0),' # *** Also deleted price per unit
    'FOREIGN KEY (client_id) REFERENCES Clients(client_id));')
 
 Order_contains = ('CREATE TABLE Order_contains('
@@ -77,7 +78,6 @@ Order_contains = ('CREATE TABLE Order_contains('
    'barcode BIGINT,'
    'shipment_id INTEGER,'
    'quantity INTEGER CHECK (quantity > 0),'
-   'price_per_unit NUMERIC CHECK (price_per_unit > 0),'
    'PRIMARY KEY(order_id, barcode),'
    'FOREIGN KEY (order_id) REFERENCES Orders(order_id),'
    'FOREIGN KEY (barcode, shipment_id) REFERENCES Inventory(barcode, shipment_id));')
@@ -199,6 +199,7 @@ def shelf_life(barcode):
 	return barcode_shelflife[barcode]
 
 print
+
 # ---------------- Shipments table ----------------------
 def date_to_string(date):
 	s = "%s"%date
@@ -356,7 +357,7 @@ random.shuffle(c_list)
 number_of_orders = 20
 for i in range(number_of_orders):
 	client_id = c_list.pop()
-	values = "(%s,'%s')"%(client_id, delivery_date)
+	values = "(%s,%s)"%(client_id, delivery_date)
 	print 'INSERT INTO %s %s VALUES %s;'%(table,columns,values)
 
 
