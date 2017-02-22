@@ -83,7 +83,6 @@ Order_contains = ('CREATE TABLE Order_contains('
    'FOREIGN KEY (barcode, shipment_id) REFERENCES Inventory(barcode, shipment_id));')
 
 
-
 print Suppliers, '\n'
 print Products, '\n'
 print Shipments, '\n'
