@@ -13,13 +13,14 @@ from time import strftime
 
 # --------- CREATE TABLES ---------------
 
+print "DROP TABLE clients, inventory, order_contains, orders, products, shipment_contains, shipments, suppliers;"
+
 Suppliers = ('CREATE TABLE Suppliers('
 	'supplier_id SERIAL PRIMARY KEY,'
 	'name VARCHAR(100),'
 	'address VARCHAR(255),'
 	'phone_number VARCHAR(100),'
 	'email VARCHAR(255));')
-
 
 Products = ('CREATE TABLE Products('
    'barcode BIGINT PRIMARY KEY NOT NULL,'
@@ -39,7 +40,6 @@ Shipments = ('CREATE TABLE Shipments('
    'is_considered INTEGER NOT NULL DEFAULT(0),'# ***
    'FOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id));')
 
-
 Shipment_contains = ('CREATE TABLE Shipment_contains('
    'shipment_id INTEGER,'
    'barcode BIGINT,'
@@ -47,7 +47,6 @@ Shipment_contains = ('CREATE TABLE Shipment_contains('
    'PRIMARY KEY (shipment_id, barcode),'
    'FOREIGN KEY (shipment_id) REFERENCES Shipments(shipment_id),'
    'FOREIGN KEY (barcode) REFERENCES Products(barcode));')
-
 
 Inventory = ('CREATE TABLE Inventory('
    'shipment_id INTEGER,'
@@ -76,12 +75,12 @@ Orders = ('CREATE TABLE Orders('
 Order_contains = ('CREATE TABLE Order_contains('
    'order_id INTEGER,'
    'barcode BIGINT,'
-   'shipment_id INTEGER,'
+   #'shipment_id INTEGER,'
    'quantity INTEGER CHECK (quantity > 0),'
    'PRIMARY KEY(order_id, barcode),'
    'FOREIGN KEY (order_id) REFERENCES Orders(order_id),'
-   'FOREIGN KEY (barcode, shipment_id) REFERENCES Inventory(barcode, shipment_id));')
-
+   #'FOREIGN KEY (barcode, shipment_id) REFERENCES Inventory(barcode, shipment_id));')
+   'FOREIGN KEY (barcode) REFERENCES Products(barcode));')
 
 print Suppliers, '\n'
 print Products, '\n'
@@ -368,11 +367,23 @@ CREATE TABLE Order_contains(
    barcode BIGINT,
    shipment_id INTEGER,
    quantity INTEGER CHECK (quantity > 0),
-   price_per_unit NUMERIC CHECK (price_per_unit > 0),
    PRIMARY KEY(order_id, barcode),
    FOREIGN KEY (order_id) REFERENCES Orders(order_id),
-   FOREIGN KEY (barcode, shipment_id) REFERENCES Inventory(barcode, shipment_id)
+   FOREIGN KEY (barcode) REFERENCES Products(barcode)
 );
 '''
+
+#inventory = shipmentID_barcode_quantity.copy()
+
+table = 'Order_contains'
+columns = '(order_id, barcode, quantity)'
+
+for oid in range(1,number_of_orders+1):
+	b_arcodes = barcodes[:]
+	random.shuffle(b_arcodes)
+	for j in range(random.randint(1,5)):
+		b = b_arcodes.pop()
+		values = '(%s,%s,%s)'%(oid, b, random.randint(1,15))
+		print 'INSERT INTO %s %s VALUES %s;'%(table,columns,values)
 
 
