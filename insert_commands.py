@@ -12,75 +12,75 @@ from time import strftime
 #print fake.domain_word() #gusikowsk
 
 # --------- CREATE TABLES ---------------
+print "-- Drop existing tables:"
+print "DROP TABLE clients, inventory, order_contains, orders, products, shipment_contains, shipments, suppliers;\n"
 
-print "DROP TABLE clients, inventory, order_contains, orders, products, shipment_contains, shipments, suppliers;"
 
+print "-- Create tables:"
 Suppliers = ('CREATE TABLE Suppliers('
-	'supplier_id SERIAL PRIMARY KEY,'
-	'name VARCHAR(100),'
-	'address VARCHAR(255),'
-	'phone_number VARCHAR(100),'
-	'email VARCHAR(255));')
+	'\n\tsupplier_id SERIAL PRIMARY KEY,'
+	'\n\tname VARCHAR(100),'
+	'\n\taddress VARCHAR(255),'
+	'\n\tphone_number VARCHAR(100),'
+	'\n\temail VARCHAR(255));')
 
 Products = ('CREATE TABLE Products('
-   'barcode BIGINT PRIMARY KEY NOT NULL,'
-   'supplier_id INTEGER,'
-   'name VARCHAR(100),'
-   'unit_weight INTEGER,'
-   'units_per_case INTEGER,'
-   'cost_per_case NUMERIC,'
-   'case_weight NUMERIC,'
-   'shelf_life INTEGER,'
-   'FOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id));')
+   '\n\tbarcode BIGINT PRIMARY KEY NOT NULL,'
+   '\n\tsupplier_id INTEGER,'
+   '\n\tname VARCHAR(100),'
+   '\n\tunit_weight INTEGER,'
+   '\n\tunits_per_case INTEGER,'
+   '\n\tcost_per_case NUMERIC,'
+   '\n\tcase_weight NUMERIC,'
+   '\n\tshelf_life INTEGER,'
+   '\n\tFOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id));')
 
 Shipments = ('CREATE TABLE Shipments('
-   'shipment_id SERIAL PRIMARY KEY,'
-   'date_received DATE,'
-   'supplier_id INTEGER,'
-   'is_considered INTEGER NOT NULL DEFAULT(0),'# ***
-   'FOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id));')
+   '\n\tshipment_id SERIAL PRIMARY KEY,'
+   '\n\tdate_received DATE,'
+   '\n\tsupplier_id INTEGER,'
+   '\n\tis_considered INTEGER NOT NULL DEFAULT(0),'# ***
+   '\n\tFOREIGN KEY (supplier_id) REFERENCES Suppliers(supplier_id));')
 
 Shipment_contains = ('CREATE TABLE Shipment_contains('
-   'shipment_id INTEGER,'
-   'barcode BIGINT,'
-   'quantity INTEGER CHECK (quantity > 0),'
-   'PRIMARY KEY (shipment_id, barcode),'
-   'FOREIGN KEY (shipment_id) REFERENCES Shipments(shipment_id),'
-   'FOREIGN KEY (barcode) REFERENCES Products(barcode));')
+   '\n\tshipment_id INTEGER,'
+   '\n\tbarcode BIGINT,'
+   '\n\tquantity INTEGER CHECK (quantity > 0),'
+   '\n\tPRIMARY KEY (shipment_id, barcode),'
+   '\n\tFOREIGN KEY (shipment_id) REFERENCES Shipments(shipment_id),'
+   '\n\tFOREIGN KEY (barcode) REFERENCES Products(barcode));')
 
 Inventory = ('CREATE TABLE Inventory('
-   'shipment_id INTEGER,'
-   'barcode BIGINT,'
-   'expiry_date DATE,'
-   'quantity INTEGER,'
-   'PRIMARY KEY(shipment_id, barcode),'
-   'FOREIGN KEY (barcode) REFERENCES Products(barcode),'
-   'FOREIGN KEY (shipment_id) REFERENCES Shipments(shipment_id));')
+   '\n\tshipment_id INTEGER,'
+   '\n\tbarcode BIGINT,'
+   '\n\texpiry_date DATE,'
+   '\n\tquantity INTEGER,'
+   '\n\tPRIMARY KEY(shipment_id, barcode),'
+   '\n\tFOREIGN KEY (barcode) REFERENCES Products(barcode),'
+   '\n\tFOREIGN KEY (shipment_id) REFERENCES Shipments(shipment_id));')
 
 Clients = ('CREATE TABLE Clients('
-   'client_id SERIAL PRIMARY KEY,'
-   'name VARCHAR(100),'
-   'address VARCHAR(255),'
-   'phone_number VARCHAR(100),'
-   'email VARCHAR(255));')
+   '\n\tclient_id SERIAL PRIMARY KEY,'
+   '\n\tname VARCHAR(100),'
+   '\n\taddress VARCHAR(255),'
+   '\n\tphone_number VARCHAR(100),'
+   '\n\temail VARCHAR(255));')
 
 Orders = ('CREATE TABLE Orders('
-   'order_id SERIAL PRIMARY KEY,'
-   'client_id INTEGER,'
-   'delivery_date DATE,'
-   'is_delivered INTEGER NOT NULL DEFAULT(0),'
-   'is_considered INTEGER NOT NULL DEFAULT(0),' # *** Also deleted price per unit
-   'FOREIGN KEY (client_id) REFERENCES Clients(client_id));')
+   '\n\torder_id SERIAL PRIMARY KEY,'
+   '\n\tclient_id INTEGER,'
+   '\n\tdelivery_date DATE,'
+   '\n\tis_delivered INTEGER NOT NULL DEFAULT(0),'
+   '\n\tis_considered INTEGER NOT NULL DEFAULT(0),' # *** Also deleted price per unit
+   '\n\tFOREIGN KEY (client_id) REFERENCES Clients(client_id));')
 
 Order_contains = ('CREATE TABLE Order_contains('
-   'order_id INTEGER,'
-   'barcode BIGINT,'
-   #'shipment_id INTEGER,'
-   'quantity INTEGER CHECK (quantity > 0),'
-   'PRIMARY KEY(order_id, barcode),'
-   'FOREIGN KEY (order_id) REFERENCES Orders(order_id),'
-   #'FOREIGN KEY (barcode, shipment_id) REFERENCES Inventory(barcode, shipment_id));')
-   'FOREIGN KEY (barcode) REFERENCES Products(barcode));')
+   '\n\torder_id INTEGER,'
+   '\n\tbarcode BIGINT,'
+   '\n\tquantity INTEGER CHECK (quantity > 0),'
+   '\n\tPRIMARY KEY(order_id, barcode),'
+   '\n\tFOREIGN KEY (order_id) REFERENCES Orders(order_id),'
+   '\n\tFOREIGN KEY (barcode) REFERENCES Products(barcode));')
 
 print Suppliers, '\n'
 print Products, '\n'
@@ -93,6 +93,8 @@ print Order_contains, '\n'
 
 # ---------- FILL SUPPLIERS TABLE ----------------
 
+print "-- Insert records into Suppliers table:"
+
 table = 'Suppliers'
 columns = '(name,address,phone_number,email)'
 n = 15
@@ -102,6 +104,8 @@ for i in range (1,n+1):
 
 print
 # ------------- FILL PRODUCTS TABLE ---------------
+
+print "-- Insert records in Products table:"
 
 f = open("../data/hummus_data.csv", "r").read().replace('$','').replace('\r','')
 lines = f.split('\n')
@@ -199,6 +203,10 @@ def shelf_life(barcode):
 print
 
 # ---------------- Shipments table ----------------------
+
+print "-- Insert records into Shipments table:"
+
+
 def date_to_string(date):
 	s = "%s"%date
 	s = s.split(' ')
@@ -229,6 +237,9 @@ for date in reversed(date_list):
 
 print
 # ----------- Shipment_contains ---------------
+
+print "-- Insert records in Shipment_contains table:"
+
 '''
 CREATE TABLE Shipment_contains(
    shipment_id INTEGER,
@@ -272,6 +283,9 @@ for shipment_id in shipment_ids:
 
 print
 # ---------------- INVENTORY ---------------------
+
+print "-- Insert records into Inventory table:"
+
 def get_expiry_date(barcode, shipment_id):
 	sdate = shipmentID_date[shipment_id]
 	exp = sdate + timedelta(days = shelf_life(barcode))
@@ -302,6 +316,8 @@ for shipment_id in shipment_ids: #sort table by shipment IDs
 
 print
 # --------------------- CLIENTS -----------------------
+print "-- Insert records into Clients table:"
+
 '''
 CREATE TABLE Clients(
    client_id SERIAL PRIMARY KEY,
@@ -332,6 +348,9 @@ client_ids = [i for i in range(1,n+1)]
 
 print
 # -------------------- ORDERS -----------------------
+
+print "-- Insert records into Orders table:"
+
 '''
 CREATE TABLE Orders(
    order_id SERIAL PRIMARY KEY,
@@ -361,6 +380,9 @@ for i in range(number_of_orders):
 
 print
 # --------------------- ORDER CONTAINS ------------------------
+
+print "-- Insert records into Order_contains table:"
+
 '''
 CREATE TABLE Order_contains(
    order_id INTEGER,
@@ -386,4 +408,81 @@ for oid in range(1,number_of_orders+1):
 		values = '(%s,%s,%s)'%(oid, b, random.randint(1,15))
 		print 'INSERT INTO %s %s VALUES %s;'%(table,columns,values)
 
+print 
+# Once order_contains table is filled, 
+# must set is_considered in orders to 1 for all oids entered to order_contains.
+# Since all orders are expanded in order_contains, we will set all is_considered to 1.
+
+print "-- Set all is_considered swtiches from '0' to '1' in Orders table:"
+
+print "UPDATE orders SET is_considered = 1 WHERE is_considered = 0;"
+
+print 
+# Now we'll insert other orders to order contains, 
+# but these orders will not be considered, ie. is_considered = 0. 
+
+#for oid in range(number_of_orders+1, number_of_orders + 6):
+#	print 
+
+
+print "-- Add 5 more records to Orders table with default is_considered switch = '0'"
+
+table = 'Orders'
+columns = '(client_id, delivery_date)'
+
+delivery_date = date_to_string(datetime.now() + timedelta(days = 5))
+
+c_list = client_ids[:]
+random.shuffle(c_list)
+
+for i in range(number_of_orders):
+	client_id = c_list.pop()
+	values = "(%s,%s)"%(client_id, delivery_date)
+	print 'INSERT INTO %s %s VALUES %s;'%(table,columns,values)
+
+
+print 
+
+print "-- Data modification commands:"
+
+print "-- 1)"
+print "/*\nDELETE FROM inventory WHERE expiry_date <= '2016-10-25';\n*/\n"
+
+print "-- 2)"
+print "/*\nUPDATE orders SET is_delivered = 1 WHERE date = '2017-02-25' AND is_delivered = 0;\n*/\n"
+
+command_3 = ('/*'
+'\nDO' 
+'\n$$'
+'\nDECLARE cid INTEGER := 14;'
+"\nDECLARE ddate DATE := '2017-02-25';"
+'\nDECLARE bcode BIGINT := 188092200086;'
+'\nDECLARE amount_to_add INTEGER := 3;'
+'\nBEGIN'
+'\nIF EXISTS (SELECT barcode FROM order_contains WHERE barcode = bcode AND order_id IN' 
+	'\n\t(SELECT order_id FROM orders WHERE client_id = cid AND delivery_date = ddate))' 
+'\nTHEN'
+	'\n\tUPDATE order_contains SET quantity = quantity+amount_to_add WHERE barcode = bcode AND order_id IN'
+		'\n\t\t(SELECT order_id FROM orders WHERE client_id = cid AND delivery_date = ddate);'
+'\nELSE'
+	'\n\tINSERT INTO order_contains (barcode, quantity, order_id) VALUES'
+		'\n\t\t(bcode, amount_to_add, (SELECT order_id FROM orders WHERE client_id = cid AND delivery_date = ddate));'
+'\nEND IF;'
+'\nEND'
+'\n$$'
+'\n*/')
+
+print "-- 3)"
+print command_3
+
+
+
+
+'''
+@ SAMSON
+INSERT YOUR COMMAND HERE AND MAKE SURE IT RUNS 
+BY UNCOMMENTING THE /* */
+Make it in the same format as above (ie. the code prints it with tabs and newlines). 
+Be sure to add a description of the data modification you made and screenshots for proof that it works, ie. before and after. 
+'''
 
