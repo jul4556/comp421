@@ -475,11 +475,9 @@ command_3 = ('/*'
 print "-- 3)"
 print command_3
 
-
-
-
 '''
-@ SAMSON
+Command # 4: 
+
 INSERT YOUR COMMAND HERE AND MAKE SURE IT RUNS 
 BY UNCOMMENTING THE /* */
 Make it in the same format as above (ie. the code prints it with tabs and newlines). 
